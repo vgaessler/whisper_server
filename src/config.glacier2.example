@@ -1,0 +1,4 @@
+Glacier2.Client.Endpoints=tcp -h 137.30.248.26 -p 4063
+Glacier2.Server.Endpoints=tcp -h 127.0.0.1
+Glacier2.SessionTimeout=60
+Glacier2.CryptPasswords=passwords.txt

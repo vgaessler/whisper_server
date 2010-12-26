@@ -1,0 +1,7 @@
+- DONE removed redundant arg in AgentManager.GetOrCreate
+- DONE removed unused vars
+- DONE fix some stupid typos
+- DONE need to add build system
+- DONE need to make sure it even compiles
+
+- minor cleanups, fix copy to dir in buildsystem, fix link

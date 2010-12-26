@@ -1,0 +1,45 @@
+<Project name="MurmurVoice" description="" standardNamespace="MurmurVoice" newfilesearch="None" enableviewstate="True" fileversion="2.0" language="C#" clr-version="Net_2_0" ctype="DotNetProject">
+  <Configurations active="Debug">
+    <Configuration name="Debug" ctype="DotNetProjectConfiguration">
+      <Output directory="./../../bin/" assembly="MurmurVoice" executeScript="" executeBeforeBuild="" executeAfterBuild="" executeBeforeBuildArguments="" executeAfterBuildArguments="" />
+      <Build debugmode="True" target="Library" />
+      <Execution runwithwarnings="True" consolepause="True" runtime="MsNet" clr-version="Net_2_0" />
+      <CodeGeneration compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="TRACE;DEBUG" generatexmldocumentation="False" win32Icon="" ctype="CSharpCompilerParameters" />
+    </Configuration>
+    <Configuration name="Release" ctype="DotNetProjectConfiguration">
+      <Output directory="./../../bin/" assembly="MurmurVoice" executeScript="" executeBeforeBuild="" executeAfterBuild="" executeBeforeBuildArguments="" executeAfterBuildArguments="" />
+      <Build debugmode="True" target="Library" />
+      <Execution runwithwarnings="True" consolepause="True" runtime="MsNet" clr-version="Net_2_0" />
+      <CodeGeneration compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="False" optimize="True" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="TRACE" generatexmldocumentation="False" win32Icon="" ctype="CSharpCompilerParameters" />
+    </Configuration>
+  </Configurations>
+  <DeploymentInformation target="" script="" strategy="File">
+    <excludeFiles />
+  </DeploymentInformation>
+  <Contents>
+    <File name="./ACLReader.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./Murmur.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./MurmurVoiceModule.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./Resources/MurmurVoice.addin.xml" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+  </Contents>
+  <References>
+    <ProjectReference type="Assembly" refto="../../bin/HttpServer.dll" localcopy="False" />
+    <ProjectReference type="Assembly" refto="../../bin/Ice.dll" localcopy="False" />
+    <ProjectReference type="Assembly" refto="../../bin/log4net.dll" localcopy="False" />
+    <ProjectReference type="Assembly" refto="../../bin/Nini.dll" localcopy="False" />
+    <ProjectReference type="Assembly" refto="../../bin/OpenMetaverse.dll" localcopy="False" />
+    <ProjectReference type="Assembly" refto="../../bin/OpenMetaverseTypes.dll" localcopy="False" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim.Framework" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim.Framework.Capabilities" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim.Framework.Servers" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim.Framework.Servers.HttpServer" />
+    <ProjectReference type="Gac" localcopy="False" refto="OpenSim.Region" />
+    <ProjectReference type="Project" localcopy="False" refto="OpenSim.Region.Framework" />
+    <ProjectReference type="Gac" localcopy="False" refto="OpenSim.Region.Framework.Interfaces" />
+    <ProjectReference type="Gac" localcopy="False" refto="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <ProjectReference type="Gac" localcopy="False" refto="System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <ProjectReference type="Gac" localcopy="False" refto="System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <ProjectReference type="Gac" localcopy="False" refto="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  </References>
+</Project>
