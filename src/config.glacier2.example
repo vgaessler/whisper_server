@@ -1,4 +1,4 @@
-Glacier2.Client.Endpoints=tcp -h 137.30.248.26 -p 4063
-Glacier2.Server.Endpoints=tcp -h 127.0.0.1
-Glacier2.SessionTimeout=60
-Glacier2.CryptPasswords=passwords.txt
+Glacier2.Client.Endpoints=tcp -h 10.224.54.180 -p 4063	# Use IP bound to interface, NOT external
+Glacier2.Server.Endpoints=tcp -h 127.0.0.1		# Use localhost
+Glacier2.SessionTimeout=60				# Should work as-is
+Glacier2.CryptPasswords=passwords.txt			# file with "username <password>" hashes

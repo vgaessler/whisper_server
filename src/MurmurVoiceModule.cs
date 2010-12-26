@@ -50,36 +50,21 @@ namespace MurmurVoice
     
     public class ServerCallbackImpl : ServerCallbackDisp_
     {
-        private ServerPrx m_server;
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ServerManager m_manager;        
 
-        public ServerCallbackImpl(ServerPrx server, ServerManager manager)
+        public ServerCallbackImpl(ServerManager manager)
         {
-            m_server = server;
             m_manager = manager;
         }
         
-        public void AddUserToChan(Agent agent)
+        public void AddUserToChan(User state, int channel)
         {
-            try
+            if(state.channel != channel)
             {
-                if(agent.session >= 0)
-                {
-                    User state = m_server.getState(agent.session);
-                    if (state.channel != agent.channel) {
-                        state.channel = agent.channel;
-                        m_server.setState(state);
-                    }
-                }
-                else
-                {
-                    m_log.DebugFormat("[MurmurVoice] Session not connected yet, deferring move for {0} to {1}.", agent.uuid.ToString(), agent.channel);
-                }
-            } catch (KeyNotFoundException)
-            {
-                m_log.DebugFormat("[MurmurVoice] No user with id {0} to move.", agent.userid);
+                state.channel = channel;
+                m_manager.Server.setState(state);
             }
         }
         
@@ -89,7 +74,7 @@ namespace MurmurVoice
             {
                 try
                 {
-                    m_server.kickUser(state.session, "This server requires registration to connect.");
+                    m_manager.Server.kickUser(state.session, "This server requires registration to connect.");
                 } catch (InvalidSessionException)
                 {
                     m_log.DebugFormat("[MurmurVoice] Couldn't kick session {0}", state.session);
@@ -99,13 +84,9 @@ namespace MurmurVoice
 
             try
             {
-                Agent agent = m_manager.Agent.Get(state.userid);
+                Agent agent = m_manager.Agent.Get(state.name);
                 agent.session = state.session;
-                if (agent.channel >= 0 && (state.channel != agent.channel))
-                {
-                    state.channel = agent.channel;
-                    m_server.setState(state);
-                }
+                AddUserToChan(state, agent.channel);
             } catch (KeyNotFoundException)
             {
                 m_log.DebugFormat("[MurmurVoice]: User {0} with userid {1} not registered in murmur manager, ignoring.", state.name, state.userid);
@@ -116,7 +97,7 @@ namespace MurmurVoice
         {
             try
             {
-                m_manager.Agent.Get(state.userid).session = -1;
+                m_manager.Agent.Get(state.name).session = -1;
             } catch (KeyNotFoundException)
             {
                 m_log.DebugFormat("[MurmurVoice]: Userid {0} not handled by murmur manager", state.userid);
@@ -145,6 +126,10 @@ namespace MurmurVoice
             get { return m_channel_manager; }
         }
 
+        public ServerPrx Server {
+            get { return m_server; }
+        }
+
         public ServerManager(ServerPrx server, string channel)
         {
             m_server = server;
@@ -163,9 +148,7 @@ namespace MurmurVoice
             m_channel_manager = new ChannelManager(m_server, channel);
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
     }
 
@@ -186,28 +169,19 @@ namespace MurmurVoice
                     chan_ids[child.c.name] = child.c.id;
 
             // Set channel if it was found, create it if it wasn't
-            if(chan_ids.ContainsKey(channel))
-                parent_chan = chan_ids[channel];
-            else
-                parent_chan = m_server.addChannel(channel, 0);
+            lock(chan_ids)
+                if(chan_ids.ContainsKey(channel))
+                    parent_chan = chan_ids[channel];
+                else
+                    parent_chan = m_server.addChannel(channel, 0);
 
             // Set permissions on channels
             Murmur.ACL[] acls = new Murmur.ACL[1];
-            acls[0] = new Murmur.ACL();
-            acls[0].group = "all";
-            acls[0].applyHere = true;
-            acls[0].applySubs = true;
-            acls[0].inherited = false;
-            acls[0].userid = -1;
-            acls[0].allow = Murmur.PermissionSpeak.value;
-            acls[0].deny = Murmur.PermissionEnter.value;
+            acls[0] = new Murmur.ACL(true, true, false, -1, "all",
+                Murmur.PermissionSpeak.value, Murmur.PermissionEnter.value);
 
             m_log.InfoFormat("[MurmurVoice] Setting ACLs on channel");
-            m_server.setACL(parent_chan, acls, (new List<Murmur.Group>()).ToArray(), true);
-        }
-
-        public void Dispose()
-        {
+            m_server.setACL(parent_chan, acls, null, true);
         }
 
         public int GetOrCreate(string name)
@@ -215,7 +189,7 @@ namespace MurmurVoice
             lock(chan_ids) {
                 if (chan_ids.ContainsKey(name))
                     return chan_ids[name];
-                m_log.InfoFormat("[MurmurVoice]: Channel '{0}' not found. Creating.", name);
+                m_log.InfoFormat("[MurmurVoice] Channel '{0}' not found. Creating.", name);
                 return chan_ids[name] = m_server.addChannel(name, parent_chan);
             }
         }
@@ -234,14 +208,19 @@ namespace MurmurVoice
             this.pass = "u" + UUID.Random().ToString().Replace("-","").Substring(0,16);
         }
 
-        public string web {
-            get { return "x" + Convert.ToBase64String(uuid.GetBytes()).Replace('+', '-').Replace('/', '_'); }
+        public string name {
+            get { return Agent.Name(uuid); }
+        }
+
+        public static string Name(UUID uuid)
+        {
+            return "x" + Convert.ToBase64String(uuid.GetBytes()).Replace('+', '-').Replace('/', '_');
         }
 
         public Dictionary<UserInfo, string> user_info {
             get {
                 Dictionary<UserInfo, string> user_info = new Dictionary<UserInfo, string>();
-                user_info[UserInfo.UserName] = this.web;
+                user_info[UserInfo.UserName] = this.name;
                 user_info[UserInfo.UserPassword] = this.pass;
                 return user_info;
             }
@@ -250,8 +229,7 @@ namespace MurmurVoice
     }
 
     public class AgentManager {
-        private Dictionary<int, Agent>  userid_to_agent = new Dictionary<int, Agent>();
-        private Dictionary<UUID, Agent> uuid_to_agent = new Dictionary<UUID, Agent>();
+        private Dictionary<string,Agent> name_to_agent = new Dictionary<string,Agent>();
         private ServerPrx m_server;
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -263,49 +241,68 @@ namespace MurmurVoice
 
         public Agent GetOrCreate(UUID uuid)
         {
-            lock(uuid_to_agent)
-                if(uuid_to_agent.ContainsKey(uuid))
-                    return uuid_to_agent[uuid];
-                else
-                    return Add(uuid);
+            string name = Agent.Name(uuid);
+            lock(name_to_agent)
+                if(name_to_agent.ContainsKey(name))
+                    return name_to_agent[name];
+                else {
+                    Agent a = Add(uuid);
+                    return a;
+                }
         }
 
         private Agent Add(UUID uuid)
         {
             Agent agent = new Agent(uuid);
 
-            foreach(var user in m_server.getRegisteredUsers(agent.web)) {
-                if(user.Value == agent.web) {
+            foreach(var user in m_server.getRegisteredUsers(agent.name))
+                if(user.Value == agent.name) {
                     m_log.InfoFormat("[MurmurVoice] Found previously registered user {0}", user.Value);
                     m_server.unregisterUser(user.Key);
-                    break;
+                    //break;
                 }
-            }
 
             agent.userid = m_server.registerUser(agent.user_info);            
-            m_log.InfoFormat("[MurmurVoice]: Registered {0} (uid {1}) identified by {2}", agent.uuid.ToString(), agent.userid, agent.pass);
+            m_log.InfoFormat("[MurmurVoice] Registered {0} (uid {1}) identified by {2}", agent.uuid.ToString(), agent.userid, agent.pass);
 
-            lock(userid_to_agent)
-                userid_to_agent[agent.userid] = agent;
-
-            lock(uuid_to_agent)
-                uuid_to_agent[agent.uuid] = agent;
+            lock(name_to_agent)
+                name_to_agent[agent.name] = agent;
             
             return agent;
         }
         
-        public Agent Get(int userid)
+        public Agent Get(string name)
         {
-            lock(userid_to_agent)
-               return userid_to_agent[userid];
+            lock(name_to_agent)
+               return name_to_agent[name];
         }
         
     }
     
+    public class KeepAlive
+    {
+      public bool running = true;
+      public ServerPrx m_server;
+      public KeepAlive(ServerPrx prx)
+      {
+        m_server = prx;
+      }
+
+      public void StartPinging()
+      {
+        if(running) {
+          m_server.ice_ping();
+          Thread.Sleep(30);
+        }
+      }
+    }
+
     public class MurmurVoiceModule : ISharedRegionModule
     {
         // ICE
         private ServerCallbackImpl m_callback;
+        private static KeepAlive m_keepalive;
+        private static Thread m_keepalive_t;
 
         // Infrastructure
         private static readonly ILog m_log =
@@ -318,11 +315,10 @@ namespace MurmurVoice
 
         // Configuration
         private IConfig m_config;
-        private static string m_murmurd_ice;
         private static string m_murmurd_host;
         private static int m_murmurd_port;
         private static ServerManager m_manager;
-        private static bool m_started;
+        private static bool m_started = false;
         private static bool m_enabled = false;
 	
         public void Initialise(IConfigSource config)
@@ -330,7 +326,7 @@ namespace MurmurVoice
             if(m_started)
                 return;
             m_started = true;
-                
+
             m_config = config.Configs["MurmurVoice"];
 
             if (null == m_config)
@@ -348,19 +344,17 @@ namespace MurmurVoice
             try
             {
                 // retrieve configuration variables
-                m_murmurd_ice = m_config.GetString("murmur_ice", String.Empty);
+                string meta_ice = "Meta:" + m_config.GetString("murmur_ice", String.Empty);
                 m_murmurd_host = m_config.GetString("murmur_host", String.Empty);
                 int server_id = m_config.GetInt("murmur_sid", 1);
                 
                 // Admin interface required values
-                if (String.IsNullOrEmpty(m_murmurd_ice) ||
+                if (String.IsNullOrEmpty(meta_ice) ||
                     String.IsNullOrEmpty(m_murmurd_host) )
                 {
                     m_log.Error("[MurmurVoice] plugin disabled: incomplete configuration");
                     return;
                 }
-
-                m_murmurd_ice = "Meta:" + m_murmurd_ice;
 
                 Ice.Communicator comm = Ice.Util.initialize();
 
@@ -374,18 +368,15 @@ namespace MurmurVoice
                     router.createSession(m_config.GetString("glacier_user","admin"),m_config.GetString("glacier_pass","password"));
                 }
 
-                MetaPrx meta = MetaPrxHelper.checkedCast(comm.stringToProxy(m_murmurd_ice));
+                MetaPrx meta = MetaPrxHelper.checkedCast(comm.stringToProxy(meta_ice));
 
                 // Create the adapter
 		comm.getProperties().setProperty("Ice.PrintAdapterReady", "0");
                 Ice.ObjectAdapter adapter;
                 if(glacier_enabled)
-                {
                     adapter = comm.createObjectAdapterWithRouter("Callback.Client", comm.getDefaultRouter() );
-                } else
-                {
+                else
                     adapter = comm.createObjectAdapterWithEndpoints("Callback.Client", m_config.GetString("murmur_ice_cb","tcp -h 127.0.0.1"));
-                }
                 adapter.activate();
 
                 // Create identity and callback for Metaserver
@@ -396,11 +387,17 @@ namespace MurmurVoice
 		MetaCallbackPrx meta_callback = MetaCallbackPrxHelper.checkedCast(adapter.add(new MetaCallbackImpl(), metaCallbackIdent ));
                 meta.addCallback(meta_callback);
 
-                m_log.InfoFormat("[MurmurVoice] using murmur server ice '{0}'", m_murmurd_ice);
+                m_log.InfoFormat("[MurmurVoice] using murmur server ice '{0}'", meta_ice);
 
                 // create a server and figure out the port name
                 Dictionary<string,string> defaults = meta.getDefaultConf();
                 ServerPrx server = ServerPrxHelper.checkedCast(meta.getServer(server_id));
+
+                // start thread to ping glacier2 router and/or determine if con$
+                m_keepalive = new KeepAlive(server);
+                ThreadStart ka_d = new ThreadStart(m_keepalive.StartPinging);
+                m_keepalive_t = new Thread(ka_d);
+                m_keepalive_t.Start();
 
                 // first check the conf for a port, if not then use server id and default port to find the right one.
                 string conf_port = server.getConf("port");
@@ -413,7 +410,7 @@ namespace MurmurVoice
                 m_manager = new ServerManager(server, m_config.GetString("channel_name","Channel"));
 
                 // Create identity and callback for this current server
-                m_callback = new ServerCallbackImpl(server, m_manager);
+                m_callback = new ServerCallbackImpl(m_manager);
                 Ice.Identity serverCallbackIdent = new Ice.Identity();
                 serverCallbackIdent.name = "serverCallback";
                 if(router != null)
@@ -435,12 +432,10 @@ namespace MurmurVoice
         public void AddRegion(Scene scene)
         {
             if(m_enabled)
-            {
                 scene.EventManager.OnRegisterCaps += delegate(UUID agentID, Caps caps)
                 {
                     OnRegisterCaps(scene, agentID, caps);
                 };
-            }
         }
         
         // Called to indicate that all loadable modules have now been added
@@ -454,6 +449,7 @@ namespace MurmurVoice
         {
             if(m_enabled)
             {
+                m_keepalive.running = false;
                 m_manager.Dispose();
             }
         }
@@ -487,16 +483,15 @@ namespace MurmurVoice
         {
             // Create parcel voice channel. If no parcel exists, then the voice channel ID is the same
             // as the directory ID. Otherwise, it reflects the parcel's ID.
-            
             if (land.LocalID != 1 && (land.Flags & (uint)ParcelFlags.UseEstateVoiceChan) == 0)
             {
-                m_log.DebugFormat("[MurmurVoice]: Region:Parcel \"{0}:{1}\": parcel id {2}", 
+                m_log.DebugFormat("[MurmurVoice] Region:Parcel \"{0}:{1}\": parcel id {2}", 
                                   scene.RegionInfo.RegionName, land.Name, land.LocalID);
                 return land.GlobalID.ToString().Replace("-","");
             }
             else
             {
-                m_log.DebugFormat("[MurmurVoice]: Region:Parcel \"{0}:{1}\": parcel id {2}", 
+                m_log.DebugFormat("[MurmurVoice] Region:Parcel \"{0}:{1}\": parcel id {2}", 
                                   scene.RegionInfo.RegionName, scene.RegionInfo.RegionName, land.LocalID);
                 return scene.RegionInfo.RegionID.ToString().Replace("-","");
             }
@@ -554,30 +549,22 @@ namespace MurmurVoice
                                                    UUID agentID, Caps caps)
         {
             try {
-                m_log.Info("[MurmurVoice]: Calling ProvisionVoiceAccountRequest...");
-                ScenePresence avatar = null;
+                m_log.Info("[MurmurVoice] Calling ProvisionVoiceAccountRequest...");
 
                 if (scene == null) throw new Exception("[MurmurVoice] Invalid scene.");
 
-                avatar = scene.GetScenePresence(agentID);
-                while(avatar == null)
-                {
-                    avatar = scene.GetScenePresence(agentID);
-                    Thread.Sleep(100);
-                }
-            
                 Agent agent = m_manager.Agent.GetOrCreate(agentID);
 
                 LLSDVoiceAccountResponse voiceAccountResponse =
-                    new LLSDVoiceAccountResponse(agent.web, agent.pass, m_murmurd_host, 
+                    new LLSDVoiceAccountResponse(agent.name, agent.pass, m_murmurd_host, 
                         String.Format("tcp://{0}:{1}", m_murmurd_host, m_murmurd_port)
                 );
                 
                 string r = LLSDHelpers.SerialiseLLSDReply(voiceAccountResponse);
-                m_log.InfoFormat("[MurmurVoice]: VoiceAccount: {0}", r);
+                m_log.InfoFormat("[MurmurVoice] VoiceAccount: {0}", r);
                 return r;
             } catch (Exception e) {
-                m_log.DebugFormat("[MurmurVoice]: {0} failed", e.ToString());
+                m_log.DebugFormat("[MurmurVoice] {0} failed", e.ToString());
                 return "<llsd><undef /></llsd>";
             }
         }
@@ -586,7 +573,7 @@ namespace MurmurVoice
         public string ParcelVoiceInfoRequest(Scene scene, string request, string path, string param,
                                              UUID agentID, Caps caps)
         {
-            m_log.Info("[MurmurVoice]: Calling ParcelVoiceInfoRequest...");
+            m_log.Info("[MurmurVoice] Calling ParcelVoiceInfoRequest...");
             try
             {
                 ScenePresence avatar = scene.GetScenePresence(agentID);
@@ -604,7 +591,7 @@ namespace MurmurVoice
                 // voice channel
                 LandData land = scene.GetLandData(avatar.AbsolutePosition.X, avatar.AbsolutePosition.Y);
 
-                m_log.DebugFormat("[MurmurVoice]: region \"{0}\": Parcel \"{1}\" ({2}): avatar \"{3}\": request: {4}, path: {5}, param: {6}",
+                m_log.DebugFormat("[MurmurVoice] region \"{0}\": Parcel \"{1}\" ({2}): avatar \"{3}\": request: {4}, path: {5}, param: {6}",
                                   scene.RegionInfo.RegionName, land.Name, land.LocalID, avatar.Name, request, path, param);
 
                 if ( ((land.Flags & (uint)ParcelFlags.AllowVoiceChat) > 0) && scene.RegionInfo.EstateSettings.AllowVoice )
@@ -615,10 +602,14 @@ namespace MurmurVoice
                     // Host/port pair for voice server
                     channel_uri = String.Format("{0}:{1}", m_murmurd_host, m_murmurd_port);
 
-                    m_log.InfoFormat("[MurmurVoice]: {0}", channel_uri);
-                    m_callback.AddUserToChan(agent);
+                    if(agent.session > 0) {
+                        Murmur.User state = m_manager.Server.getState(agent.session);
+                        m_callback.AddUserToChan(state, agent.channel);
+                    }
+
+                    m_log.InfoFormat("[MurmurVoice] {0}", channel_uri);
                 } else {
-                    m_log.DebugFormat("[MurmurVoice]: Voice not enabled.");
+                    m_log.DebugFormat("[MurmurVoice] Voice not enabled.");
                 }
 
                 Hashtable creds = new Hashtable();
@@ -626,13 +617,13 @@ namespace MurmurVoice
 
                 parcelVoiceInfo = new LLSDParcelVoiceInfoResponse(scene.RegionInfo.RegionName, land.LocalID, creds);
                 string r = LLSDHelpers.SerialiseLLSDReply(parcelVoiceInfo);
-                m_log.InfoFormat("[MurmurVoice]: Parcel: {0}", r);
+                m_log.InfoFormat("[MurmurVoice] Parcel: {0}", r);
                 
                 return r;
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice]: Exception: " + e.ToString());
+                m_log.ErrorFormat("[MurmurVoice] Exception: " + e.ToString());
                 return "<llsd><undef /></llsd>";
             }
         }
