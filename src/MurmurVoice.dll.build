@@ -34,7 +34,7 @@
                 <include name="opensim/bin/OpenMetaverseTypes.dll" />
                 <include name="OpenSim.exe" />
                 <include name="OpenSim.Framework.dll" />
-                <include name="OpenSim.Framework.Capabilities.dll" />
+                <include name="OpenSim.Capabilities.dll" />
                 <include name="OpenSim.Framework.Servers.dll" />
                 <include name="OpenSim.Framework.Servers.HttpServer.dll" />
                 <include name="OpenSim.Region.dll" />
