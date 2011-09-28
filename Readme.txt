@@ -8,7 +8,7 @@ Instructions for Building MurmurVoice.dll:
 1. cd src/
 2. nant
 
-That's it, the MurmurVoice.dll will be copied to src/opensim/bin
+That's it, the MurmurVoice.dll will be copied to src/opensim/bin, as will the Ice.dll and Glacier2.dll dependencies.
 
 
 I had to change the ProvisionVoiceAccountRequest and
