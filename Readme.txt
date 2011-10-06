@@ -1,4 +1,4 @@
-Current OpenSim Revision: commit 4c1365f1496b2c60c313b6d221362d3e09a8c1d4
+Current OpenSim Revision: commit a3531dec1aaafdcd22a70764cc512dd5666c75fc
 
 Instructions for Building MurmurVoice.dll:
 
@@ -8,7 +8,7 @@ Instructions for Building MurmurVoice.dll:
 1. cd src/
 2. nant
 
-That's it, the MurmurVoice.dll will be copied to src/opensim/bin
+That's it, the MurmurVoice.dll will be copied to src/opensim/bin, as will the Ice.dll and Glacier2.dll dependencies.
 
 
 I had to change the ProvisionVoiceAccountRequest and
