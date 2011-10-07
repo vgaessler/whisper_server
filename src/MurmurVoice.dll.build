@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <project name="MurmurVoice" default="build">
+      <property name="osbin" value="."/>
 	  <target name="build">
 		  <echo message="Build Directory is ${project::get-base-directory()}/bin" />
 		  <mkdir dir="${project::get-base-directory()}/bin" />
@@ -20,18 +21,18 @@
 				  <include name="Murmur.cs" />
 				  <include name="MurmurVoiceModule.cs" />
 			  </sources>
-			  <references basedir="${project::get-base-directory()}">
+			  <references basedir="${osbin}">
 				  <lib>
 					  <include name="${project::get-base-directory()}" />
 					  <include name="${project::get-base-directory()}/opensim/bin" />
 				  </lib>
-                <include name="opensim/bin/HttpServer.dll" />
-                <include name="opensim/bin/Ice.dll" />
-                <include name="opensim/bin/Glacier2.dll" />
-                <include name="opensim/bin/log4net.dll" />
-                <include name="opensim/bin/Nini.dll" />
-                <include name="opensim/bin/OpenMetaverse.dll" />
-                <include name="opensim/bin/OpenMetaverseTypes.dll" />
+                <include name="HttpServer.dll" />
+                <include name="Ice.dll" />
+                <include name="Glacier2.dll" />
+                <include name="log4net.dll" />
+                <include name="Nini.dll" />
+                <include name="OpenMetaverse.dll" />
+                <include name="OpenMetaverseTypes.dll" />
                 <include name="OpenSim.exe" />
                 <include name="OpenSim.Framework.dll" />
                 <include name="OpenSim.Capabilities.dll" />
@@ -40,33 +41,12 @@
                 <include name="OpenSim.Region.dll" />
                 <include name="OpenSim.Region.Framework.dll" />
                 <include name="OpenSim.Region.Framework.Interfaces.dll" />
-                <include name="Ice.dll" />
                 <include name="System.dll" />
                 <include name="System.Data.dll" />
                 <include name="System.Web.dll" />
                 <include name="System.Xml.dll" />
 			  </references>
 		  </csc>
-        <echo message="Copying from [${project::get-base-directory()}/bin/] to [${project::get-base-directory()}/opensim/bin/" />
-        <mkdir dir="${project::get-base-directory()}/opensim/bin/"/>
-        <copy todir="${project::get-base-directory()}/opensim/bin/">
-            <fileset basedir="${project::get-base-directory()}/bin/" >
-                <include name="*.dll"/>
-                <include name="*.exe"/>
-                <include name="*.mdb"/>
-                <include name="*.pdb"/>
-            </fileset>
-        </copy>
-        <echo message="Copying from [${project::get-base-directory()}/deps/] to [${project::get-base-directory()}/opensim/bin/" />
-        <mkdir dir="${project::get-base-directory()}/opensim/bin/"/>
-        <copy todir="${project::get-base-directory()}/opensim/bin/">
-            <fileset basedir="${project::get-base-directory()}/deps/" >
-                <include name="*.dll"/>
-                <include name="*.exe"/>
-                <include name="*.mdb"/>
-                <include name="*.pdb"/>
-            </fileset>
-        </copy>
 	  </target>
 	  <target name="clean">
 		  <delete dir="${bin.dir}" failonerror="false" />
