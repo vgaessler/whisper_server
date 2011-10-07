@@ -1,0 +1,3 @@
+#!/bin/sh
+kill `cat /tmp/murmur.pid`
+rm -f /tmp/murmur.pid /tmp/murmur.db

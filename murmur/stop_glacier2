@@ -1,0 +1,3 @@
+#!/bin/sh
+kill `cat /tmp/glacier2.pid`
+rm -f /tmp/glacier2.pid

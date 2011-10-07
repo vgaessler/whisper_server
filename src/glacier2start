@@ -1,2 +1,0 @@
-#!/bin/sh
-glacier2router --Ice.Config=config.glacier2 &

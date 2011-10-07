@@ -1,0 +1,22 @@
+Whisper OpenSim Voice Module
+============================
+
+For a detailed documentation,  please check doc/Whisper_Murmur_Config.pdf
+
+Many thanks to Snoopy Pfeffer, Justin Clark-Casey, and Brian Becker for making this release possible.
+
+Release Notes
+=============
+0.2.0
+-----
+- updated to compile for OpenSim 0.7.1+ (thanks to Justin)
+- grid support (thanks Snoopy)
+- glacier2 support (thanks Brian)
+
+0.1.1
+-----
+- initial version
+- for OpenSim standalone configuration
+
+---------------------------------
+Contact: volker.gaessler@vcomm.ch

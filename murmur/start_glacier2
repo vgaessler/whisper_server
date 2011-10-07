@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /home/opensim/mumble
+glacier2router --Ice.Config=config.glacier2 --daemon --nochdir --pidfile /tmp/glacier2.pid

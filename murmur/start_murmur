@@ -1,0 +1,4 @@
+#!/bin/sh
+rm -f /tmp/murmur.pid /tmp/murmur.db
+cd /home/opensim/mumble/murmur-static_x86-1.2.1
+./murmur.x86 -ini ./murmur.ini
