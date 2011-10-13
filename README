@@ -7,6 +7,10 @@ Many thanks to Snoopy Pfeffer, Justin Clark-Casey, and Brian Becker for making t
 
 Release Notes
 =============
+0.2.0.os071.0
+-------------
+- 0.2.0 for OpenSim 0.7.1.1
+
 0.2.0
 -----
 - updated to compile for OpenSim 0.7.1+ (thanks to Justin)
