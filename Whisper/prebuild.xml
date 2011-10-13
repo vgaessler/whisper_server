@@ -49,7 +49,7 @@
   <Reference name="OpenSim.Framework.Servers.HttpServer"/>
 
   <Reference name="OpenSim.Region.Framework"/>
-  <Reference name="OpenSim.Capabilities"/>
+  <Reference name="OpenSim.Framework.Capabilities"/>
   <Reference name="OpenSim.Server.Handlers"/>
   <Reference name="log4net" path="../../../bin/"/>
   <Reference name="XMLRPC" path="../../../bin/"/>
