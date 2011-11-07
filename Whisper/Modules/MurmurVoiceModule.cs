@@ -584,13 +584,13 @@ namespace MurmurVoice
 
             if (null == m_config)
             {
-                m_log.Info("[MurmurVoice] no config found, plugin disabled");
+                m_log.Info("[MurmurVoice] No config found, plugin disabled");
                 return;
             }
 
             if (!m_config.GetBoolean("enabled", false))
             {
-                m_log.Info("[MurmurVoice] plugin disabled by configuration");
+                m_log.Info("[MurmurVoice] Plugin disabled by configuration");
                 return;
             }
 
@@ -611,11 +611,11 @@ namespace MurmurVoice
             if (String.IsNullOrEmpty(m_murmurd_ice) ||
                 String.IsNullOrEmpty(m_murmurd_host) )
             {
-                m_log.Error("[MurmurVoice] plugin disabled: incomplete configuration");
+                m_log.Error("[MurmurVoice] Plugin disabled: incomplete configuration");
                 return;
             }
 
-            m_log.Info("[MurmurVoice] enabled");
+            m_log.Info("[MurmurVoice] Enabled");
             m_enabled = true;
         }
 
@@ -647,14 +647,23 @@ namespace MurmurVoice
                         m_router.createSession(m_glacier_user, m_glacier_pass);
                     }
 
+                    m_log.DebugFormat("[MurmurVoice] Setting up connection to mumble server at {0}", m_murmurd_ice);
+
                     MetaPrx meta = MetaPrxHelper.checkedCast(comm.stringToProxy(m_murmurd_ice));
 
                     // Create the adapter
                     comm.getProperties().setProperty("Ice.PrintAdapterReady", "0");
                     if (m_glacier_enabled)
-                        m_adapter = comm.createObjectAdapterWithRouter("Callback.Client", comm.getDefaultRouter() );
+                    {
+                        m_log.DebugFormat("[MurmurVoice] Setting up Glacier callback");
+                        m_adapter = comm.createObjectAdapterWithRouter("Callback.Client", comm.getDefaultRouter());
+                    }
                     else
+                    {
+                        m_log.DebugFormat("[MurmurVoice] Setting up non-Glacier callback {0}", m_murmur_ice_cb);
                         m_adapter = comm.createObjectAdapterWithEndpoints("Callback.Client", m_murmur_ice_cb);
+                    }
+
                     m_adapter.activate();
 
                     // Create identity and callback for Metaserver
@@ -665,7 +674,7 @@ namespace MurmurVoice
                     MetaCallbackPrx meta_callback = MetaCallbackPrxHelper.checkedCast(m_adapter.add(new MetaCallbackImpl(), metaCallbackIdent));
                     meta.addCallback(meta_callback);
 
-                    m_log.InfoFormat("[MurmurVoice] using murmur server ice '{0}'", m_murmurd_ice);
+                    m_log.InfoFormat("[MurmurVoice] Using murmur server ice '{0}'", m_murmurd_ice);
 
                     // create a server and figure out the port name
                     Dictionary<string,string> defaults = meta.getDefaultConf();
@@ -692,7 +701,7 @@ namespace MurmurVoice
                     {
                     }
 
-                    m_log.Info("[MurmurVoice] started");
+                    m_log.Info("[MurmurVoice] Started");
                 }
 
                 // starts the server and gets a callback
@@ -710,13 +719,13 @@ namespace MurmurVoice
                 m_server.addCallback(ServerCallbackPrxHelper.checkedCast(m_adapter.add(GetServerCallback(scene), serverCallbackIdent)));
 
                 // Show information on console for debugging purposes
-                m_log.InfoFormat("[MurmurVoice] using murmur server '{0}:{1}', sid '{2}'", m_murmurd_host, m_murmurd_port, m_server_id);
-                m_log.Info("[MurmurVoice] plugin enabled");
+                m_log.InfoFormat("[MurmurVoice] Using murmur server '{0}:{1}', sid '{2}'", m_murmurd_host, m_murmurd_port, m_server_id);
+                m_log.Info("[MurmurVoice] Plugin enabled");
                 m_enabled = true;
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice] plugin initialization failed: {0}", e.ToString());
+                m_log.ErrorFormat("[MurmurVoice] Plugin initialization failed: {0}{1}", e.Message, e.StackTrace);
                 return;
             }
         }
@@ -1015,7 +1024,7 @@ namespace MurmurVoice
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice] Exception: " + e.ToString());
+                m_log.ErrorFormat("[MurmurVoice] Exception: {0}{1}" + e.Message, e.StackTrace);
                 return "<llsd><undef /></llsd>";
             }
         }
