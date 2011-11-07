@@ -904,7 +904,15 @@ namespace MurmurVoice
                                                        }));
         }
 
+        /// <summary>
         /// Callback for a client request for Voice Account Details.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="request"></param>
+        /// <param name="path"></param>
+        /// <param name="param"></param>
+        /// <param name="agentID"></param>
+        /// <returns></returns>
         public string ProvisionVoiceAccountRequest(Scene scene, string request, string path, string param,
                                                    UUID agentID)
         {
@@ -945,7 +953,15 @@ namespace MurmurVoice
             }
         }
 
-        /// Callback for a client request for ParcelVoiceInfo
+        /// <summary>
+        /// Handle the client request to the ParcelVoiceInfoRequest capability.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="request"></param>
+        /// <param name="path"></param>
+        /// <param name="param"></param>
+        /// <param name="agentID"></param>
+        /// <returns></returns>
         public string ParcelVoiceInfoRequest(Scene scene, string request, string path, string param,
                                              UUID agentID)
         {
