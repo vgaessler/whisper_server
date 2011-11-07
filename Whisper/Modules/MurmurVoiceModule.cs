@@ -542,7 +542,7 @@ namespace MurmurVoice
         private static string m_glacier_user;
         private static string m_glacier_pass;
         private static string m_murmur_ice_cb;
-        private static string m_channel_name;
+        private static string m_parent_channel_name;
         private static Dictionary<UUID, ServerManager> m_managers = new Dictionary<UUID, ServerManager>();
         private static Dictionary<UUID, ServerCallbackImpl> m_servercallbacks = new Dictionary<UUID, ServerCallbackImpl>();
         private static bool m_enabled = false;
@@ -600,7 +600,7 @@ namespace MurmurVoice
             m_murmurd_ice = "Meta:" + m_config.GetString("murmur_ice", String.Empty);
             m_murmur_ice_cb = m_config.GetString("murmur_ice_cb", "tcp -h 127.0.0.1");
 
-            m_channel_name = m_config.GetString("channel_name", "Channel").Replace(" ","_");
+            m_parent_channel_name = m_config.GetString("channel_name", "Channel").Replace(" ","_");
 
             m_glacier_enabled = m_config.GetBoolean("glacier", false);
             m_glacier_ice = m_config.GetString("glacier_ice", String.Empty);
@@ -705,7 +705,7 @@ namespace MurmurVoice
                 }
 
                 // starts the server and gets a callback
-                ServerManager manager = new ServerManager(m_server, m_channel_name);
+                ServerManager manager = new ServerManager(m_server, m_parent_channel_name);
 
                 // Create identity and callback for this current server
                 AddServerCallback(scene, new ServerCallbackImpl(manager));
