@@ -27,6 +27,7 @@ using System.Collections;
 using System.Threading;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Xml;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
@@ -441,15 +442,22 @@ namespace MurmurVoice
 
             try
             {
+                m_log.DebugFormat(
+                    "[MurmurVoice]: Registering user {0} {1} password {2} with Mummur server", agent.name, agent.uuid, agent.pass);
+
                 int r = m_server.registerUser(agent.user_info);
                 if (r >= 0) agent.userid = r;
             }
-            catch (Murmur.InvalidUserException)
+            catch (Murmur.InvalidUserException e)
             {
-                m_log.Warn("[MurmurVoice] InvalidUserException; continuing to recover later");
+                m_log.WarnFormat(
+                    "[MurmurVoice] InvalidUserException; continuing to recover later.  {0}{1}",
+                    e.Message, e.StackTrace);
             }
 
-            m_log.DebugFormat("[MurmurVoice] Registered {0} (uid {1}) identified by {2}", agent.uuid.ToString(), agent.userid, agent.pass);
+            m_log.DebugFormat(
+                "[MurmurVoice] Registered {0} {1} (Murmur uid {2}) identified by {3}",
+                agent.name, agent.uuid, agent.userid, agent.pass);
 
             return agent;
         }
@@ -660,7 +668,7 @@ namespace MurmurVoice
                     }
                     else
                     {
-                        m_log.DebugFormat("[MurmurVoice] Setting up non-Glacier callback {0}", m_murmur_ice_cb);
+                        m_log.DebugFormat("[MurmurVoice] Setting up non-Glacier callback listener {0}", m_murmur_ice_cb);
                         m_adapter = comm.createObjectAdapterWithEndpoints("Callback.Client", m_murmur_ice_cb);
                     }
 
@@ -671,7 +679,8 @@ namespace MurmurVoice
                     metaCallbackIdent.name = "metaCallback";
                     if (m_router != null)
                         metaCallbackIdent.category = m_router.getCategoryForClient();
-                    MetaCallbackPrx meta_callback = MetaCallbackPrxHelper.checkedCast(m_adapter.add(new MetaCallbackImpl(), metaCallbackIdent));
+                    MetaCallbackPrx meta_callback
+                        = MetaCallbackPrxHelper.checkedCast(m_adapter.add(new MetaCallbackImpl(), metaCallbackIdent));
                     meta.addCallback(meta_callback);
 
                     m_log.InfoFormat("[MurmurVoice] Using murmur server ice '{0}'", m_murmurd_ice);
@@ -716,10 +725,17 @@ namespace MurmurVoice
                 if (m_router != null)
                     serverCallbackIdent.category = m_router.getCategoryForClient();
 
-                m_server.addCallback(ServerCallbackPrxHelper.checkedCast(m_adapter.add(GetServerCallback(scene), serverCallbackIdent)));
+                m_log.DebugFormat(
+                    "[MurmurVoice] Adding murmur ICE ServerCallback {0} at listener {1}",
+                    serverCallbackIdent.name, m_murmur_ice_cb);
+                m_server.addCallback(
+                    ServerCallbackPrxHelper.checkedCast(m_adapter.add(GetServerCallback(scene), serverCallbackIdent)));
 
                 // Show information on console for debugging purposes
-                m_log.InfoFormat("[MurmurVoice] Using murmur server '{0}:{1}', sid '{2}'", m_murmurd_host, m_murmurd_port, m_server_id);
+                m_log.InfoFormat(
+                    "[MurmurVoice] Murmur server address for clients is '{0}:{1}', sid '{2}'",
+                    m_murmurd_host, m_murmurd_port, m_server_id);
+
                 m_log.Info("[MurmurVoice] Plugin enabled");
                 m_enabled = true;
             }
@@ -1008,7 +1024,8 @@ namespace MurmurVoice
                     {
                         if (++retry > 50)
                         {
-                            m_log.ErrorFormat("[MurmurVoice] Connecting failed {0} (uid {1}) identified by {2}", agent.uuid.ToString(), agent.userid, agent.pass);
+                            m_log.ErrorFormat("[MurmurVoice] Connecting failed {0} (uid {1}) identified by {2}",
+                                              agent.uuid.ToString(), agent.userid, agent.pass);
 
                             return "<llsd><undef /></llsd>";
                         }
@@ -1032,7 +1049,8 @@ namespace MurmurVoice
                 Hashtable creds = new Hashtable();
                 creds["channel_uri"] = channel_uri;
 
-                LLSDParcelVoiceInfoResponse parcelVoiceInfo = new LLSDParcelVoiceInfoResponse(scene.RegionInfo.RegionName, land.LocalID, creds);
+                LLSDParcelVoiceInfoResponse parcelVoiceInfo
+                    = new LLSDParcelVoiceInfoResponse(scene.RegionInfo.RegionName, land.LocalID, creds);
                 string r = LLSDHelpers.SerialiseLLSDReply(parcelVoiceInfo);
                 m_log.DebugFormat("[MurmurVoice] Parcel: {0}", r);
 
