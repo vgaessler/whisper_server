@@ -387,8 +387,7 @@ namespace MurmurVoice
             m_log.DebugFormat("[MurmurVoice] Removing registered user {0}", user.name);
 
             lock (name_to_agent)
-                if (name_to_agent.ContainsKey(user.name))
-                    name_to_agent.Remove(user.name);
+                name_to_agent.Remove(user.name);
         }
 
         private Agent Add(UUID uuid, Scene scene)
