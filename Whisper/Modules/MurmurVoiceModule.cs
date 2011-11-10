@@ -443,7 +443,7 @@ namespace MurmurVoice
             try
             {
                 m_log.DebugFormat(
-                    "[MurmurVoice]: Registering user {0} {1} password {2} with Mummur server", agent.name, agent.uuid, agent.pass);
+                    "[MurmurVoice]: Registering user {0} {1} password {2} with Murmur server", agent.name, agent.uuid, agent.pass);
 
                 int r = m_server.registerUser(agent.user_info);
                 if (r >= 0) agent.userid = r;
@@ -1058,7 +1058,7 @@ namespace MurmurVoice
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice] Exception: {0}{1}" + e.Message, e.StackTrace);
+                m_log.ErrorFormat("[MurmurVoice] Exception: {0}{1}", e.Message, e.StackTrace);
                 return "<llsd><undef /></llsd>";
             }
         }
