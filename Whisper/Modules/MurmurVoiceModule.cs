@@ -794,11 +794,12 @@ namespace MurmurVoice
 
         public void ClientClosed(UUID agentID, Scene scene)
         {
-            m_log.DebugFormat("[MurmurVoice]: ClientClosed {0}", agentID);
+            m_log.DebugFormat("[MurmurVoice]: ClientClosed {0} on {1}", agentID, scene.RegionInfo.RegionName);
 
             ScenePresence avatar = scene.GetScenePresence(agentID);
 
-            if ((avatar == null) || (avatar.IsChildAgent)) return;
+            if ((avatar == null) || (avatar.IsChildAgent))
+                return;
 
             GetServerManager(scene).Agent.RemoveAgent(agentID);
         }
