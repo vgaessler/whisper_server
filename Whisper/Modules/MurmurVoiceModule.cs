@@ -367,13 +367,17 @@ namespace MurmurVoice
         {
             string name = Agent.Name(uuid);
             lock (name_to_agent)
+            {
                 if (name_to_agent.ContainsKey(name))
+                {
                     return (name_to_agent[name].session < 0 ? null : name_to_agent[name]);
+                }
                 else
                 {
                     Agent a = Add(uuid, scene);
                     return a;
                 }
+            }
         }
 
         public void RemoveAgent(UUID uuid)
@@ -399,12 +403,16 @@ namespace MurmurVoice
 
                 if (user.name == agent.name)
                 {
-                    m_log.DebugFormat("[MurmurVoice] Found previously registered user {0} {1} {2} {3}", user.name, user.userid, user.session, user.channel);
+                    m_log.DebugFormat(
+                        "[MurmurVoice] Found previously registered user {0} {1} {2} {3}",
+                        user.name, user.userid, user.session, user.channel);
 
                     if ((user.userid >= 0) && (user.session >= 0))
                     {
                         // Reuse Murmur User
-                        m_log.DebugFormat("[MurmurVoice] Reusing previously registered user {0} {1} {2} {3}", user.name, user.userid, user.session, user.channel);
+                        m_log.DebugFormat(
+                            "[MurmurVoice] Reusing previously registered user {0} {1} {2} {3}",
+                            user.name, user.userid, user.session, user.channel);
 
                         agent.userid = user.userid;
                         agent.session = user.session;
@@ -443,16 +451,20 @@ namespace MurmurVoice
             try
             {
                 m_log.DebugFormat(
-                    "[MurmurVoice]: Registering user {0} {1} password {2} with Murmur server", agent.name, agent.uuid, agent.pass);
+                    "[MurmurVoice]: Registering user {0} {1} password {2} with Murmur server",
+                    agent.name, agent.uuid, agent.pass);
 
                 int r = m_server.registerUser(agent.user_info);
-                if (r >= 0) agent.userid = r;
+                if (r >= 0)
+                    agent.userid = r;
             }
             catch (Murmur.InvalidUserException e)
             {
                 m_log.WarnFormat(
-                    "[MurmurVoice] InvalidUserException; continuing to recover later.  {0}{1}",
+                    "[MurmurVoice] InvalidUserException; {0}{1}",
                     e.Message, e.StackTrace);
+
+                return null;
             }
 
             m_log.DebugFormat(
@@ -849,19 +861,18 @@ namespace MurmurVoice
         {
             // Create parcel voice channel. If no parcel exists, then the voice channel ID is the same
             // as the directory ID. Otherwise, it reflects the parcel's ID.
+            string channelName;
             
             if (land.LocalID != 1 && (land.Flags & (uint)ParcelFlags.UseEstateVoiceChan) == 0)
-            {
-                m_log.DebugFormat("[MurmurVoice]: Region: parcel \"{0}:{1}\": parcel id {2}  {3}", 
-                                  scene.RegionInfo.RegionName, land.Name, land.LocalID, land.GlobalID.ToString().Replace("-",""));
-                return land.GlobalID.ToString().Replace("-","");
-            }
+                channelName = land.GlobalID.ToString().Replace("-","");
             else
-            {
-                m_log.DebugFormat("[MurmurVoice]: Region: parcel \"{0}:{1}\": parcel id {2}  {3}", 
-                                  scene.RegionInfo.RegionName, scene.RegionInfo.RegionName, land.LocalID, scene.RegionInfo.RegionID.ToString().Replace("-",""));
-                return scene.RegionInfo.RegionID.ToString().Replace("-","");
-            }
+                channelName = scene.RegionInfo.RegionID.ToString().Replace("-","");
+
+            m_log.DebugFormat(
+                "[MurmurVoice]: Channel name {0} for region:parcel \"{1}:{2}\": parcel id {3}",
+                scene.RegionInfo.RegionName, land.Name, land.LocalID, channelName);
+
+            return channelName;
         }
 
         // OnRegisterCaps is invoked via the scene.EventManager
@@ -964,7 +975,7 @@ namespace MurmurVoice
             }
             catch (Exception e)
             {
-                m_log.DebugFormat("[MurmurVoice] {0} failed", e.ToString());
+                m_log.DebugFormat("[MurmurVoice] Exception {0}{1}", e.Message, e.StackTrace);
                 return "<llsd><undef /></llsd>";
             }
         }
@@ -1011,7 +1022,9 @@ namespace MurmurVoice
 
                     if (agent == null)
                     {
-                        m_log.ErrorFormat("[MurmurVoice] Agent not connected {0}", agentID);
+                        m_log.WarnFormat(
+                            "[MurmurVoice] Agent {0} not registered with Murmur server.  Waiting for retry by viewer.",
+                            agentID);
 
                         return "<llsd><undef /></llsd>";
                     }
@@ -1039,7 +1052,7 @@ namespace MurmurVoice
                     Murmur.User state = manager.Server.getState(agent.session);
                     GetServerCallback(scene).AddUserToChan(state, agent.channel);
 
-                    m_log.DebugFormat("[MurmurVoice] {0}", channel_uri);
+//                    m_log.DebugFormat("[MurmurVoice] {0}", channel_uri);
                 }
                 else
                 {
@@ -1096,6 +1109,7 @@ namespace MurmurVoice
                 m_log.Warn(message);
                 return "Mumble server info is not available.";
             }
+
             if (httpRequest.Headers.GetValues("avatar_uuid") == null)
             {
                 httpResponse.StatusCode = 400;
@@ -1145,7 +1159,7 @@ namespace MurmurVoice
                         GetServerCallback(scene).AddUserToChan(state, agent.channel);
                     }
 
-                    m_log.InfoFormat("[MurmurVoice] {0}", channel_uri);
+                    m_log.InfoFormat("[MurmurVoice] channel_uri {0}", channel_uri);
                 }
                 else
                 {
