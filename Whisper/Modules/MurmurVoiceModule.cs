@@ -899,7 +899,7 @@ namespace MurmurVoice
             caps.RegisterHandler("ProvisionVoiceAccountRequest",
                                  new RestStreamHandler("POST", capsBase + m_provisionVoiceAccountRequestPath,
                                                        delegate(string request, string path, string param,
-                                                                OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                                                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                                                        {
                                                            return ProvisionVoiceAccountRequest(scene, request, path, param,
                                                                                                agentID);
@@ -907,7 +907,7 @@ namespace MurmurVoice
             caps.RegisterHandler("ParcelVoiceInfoRequest",
                                  new RestStreamHandler("POST", capsBase + m_parcelVoiceInfoRequestPath,
                                                        delegate(string request, string path, string param,
-                                                                OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                                                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                                                        {
                                                            return ParcelVoiceInfoRequest(scene, request, path, param,
                                                                                          agentID);
@@ -915,7 +915,7 @@ namespace MurmurVoice
             caps.RegisterHandler("ChatSessionRequest",
                                  new RestStreamHandler("POST", capsBase + m_chatSessionRequestPath,
                                                        delegate(string request, string path, string param,
-                                                                OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                                                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                                                        {
                                                            return ChatSessionRequest(scene, request, path, param,
                                                                                      agentID);
@@ -925,7 +925,7 @@ namespace MurmurVoice
             caps.RegisterHandler("mumble_server_info",
                                  new RestStreamHandler("GET", capsBase + m_chatSessionRequestPath,
                                                        delegate(string request, string path, string param,
-                                                                OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                                                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                                                        {
                                                            return RestGetMumbleServerInfo(scene, request, path, param, httpRequest, httpResponse);
                                                        }));
@@ -1098,7 +1098,7 @@ namespace MurmurVoice
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns>Information about the mumble server in http response headers</returns>
         public string RestGetMumbleServerInfo(Scene scene, string request, string path, string param,
-                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+                                       IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             if (m_murmurd_host == null)
             {
