@@ -10,8 +10,6 @@
 // Ice version 3.3.1
 // Generated from file `Murmur.ice'
 
-/// Original source at https://github.com/vgaessler/whisper_server
-
 #if __MonoCS__
 
 using _System = System;
