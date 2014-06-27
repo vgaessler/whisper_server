@@ -37,6 +37,9 @@ are going to use the Glacier option.
 
 #Release Notes#
 
+##Development##
+- updated to compile from OpenSim 0.7.3 to 0.8 and current OpenSimulator dev code.
+
 ##0.2.0##
 - updated to compile for OpenSim 0.7.1+ (thanks to Justin)
 - grid support (thanks Snoopy)
