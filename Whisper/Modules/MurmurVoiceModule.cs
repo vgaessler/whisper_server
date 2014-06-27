@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// Original source at https://github.com/vgaessler/whisper_server
 using Mono.Addins;
 using System;
 using System.IO;
