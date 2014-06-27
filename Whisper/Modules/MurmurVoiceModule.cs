@@ -1214,6 +1214,8 @@ namespace MurmurVoice
 
             Dictionary<int, User> users = m_server.getUsers();
 
+            m_log.InfoFormat("Users Connected: {0}", users.Count);
+
             foreach (var v in users)
             {
                 User user = v.Value;
