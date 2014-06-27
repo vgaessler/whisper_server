@@ -1,37 +1,37 @@
 <?xml version="1.0" ?>
-<Project name="Whisper" path="addon-modules/Whisper/Modules" type="Library">
+<Project name="Whisper" path="addon-modules/Whisper/Whisper/Modules" type="Library">
   <Configuration name="Debug" platform="x86">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Release" platform="x86">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug" platform="x64">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Release" platform="x64">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug" platform="AnyCPU">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Release" platform="AnyCPU">
     <Options>
-      <OutputPath>../../../bin/</OutputPath>
+      <OutputPath>../../../../bin/</OutputPath>
     </Options>
   </Configuration>
 
-  <ReferencePath>../../../bin/</ReferencePath>
+  <ReferencePath>../../../../bin/</ReferencePath>
   <Reference name="Mono.Addins.dll"/>
   <Reference name="System" localCopy="false"/>
   <Reference name="System.Core"/>
@@ -40,9 +40,9 @@
   <Reference name="System.Drawing"/>
   <Reference name="System.Windows.Forms"/>
   <Reference name="System.Data"/>
-  <Reference name="Nini" path="../../../bin/"/>
-  <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
-  <Reference name="OpenMetaverse" path="../../../bin/"/>
+  <Reference name="Nini"/>
+  <Reference name="OpenMetaverseTypes"/>
+  <Reference name="OpenMetaverse"/>
   <Reference name="OpenSim.Framework"/>
   <Reference name="OpenSim.Framework.Console"/>
   <Reference name="OpenSim.Framework.Servers"/>
@@ -51,11 +51,11 @@
   <Reference name="OpenSim.Region.Framework"/>
   <Reference name="OpenSim.Capabilities"/>
   <Reference name="OpenSim.Server.Handlers"/>
-  <Reference name="log4net" path="../../../bin/"/>
-  <Reference name="XMLRPC" path="../../../bin/"/>
-  <Reference name="HttpServer_OpenSim" path="../../../bin/"/>
-  <Reference name="Glacier2" path="../../../bin/"/>
-  <Reference name="Ice" path="../../../bin/"/>
+  <Reference name="log4net"/>
+  <Reference name="XMLRPC"/>
+  <Reference name="HttpServer_OpenSim"/>
+  <Reference name="Glacier2"/>
+  <Reference name="Ice"/>
 
   <Files>
     <Match pattern="*.cs" recurse="true"/>

@@ -1,12 +1,40 @@
 Whisper OpenSim Voice Module
 ============================
 
-For a detailed documentation,  please check doc/Whisper_Murmur_Config.pdf
+For detailed documentation please check [CONFIG].
 
-Many thanks to Snoopy Pfeffer, Justin Clark-Casey, and Brian Becker for making this release possible.
+Building
+========
+
+To use Whisper, one has to
+
+1.  Build and/or install the OpenSimulator module.
+2.  Build and/or install the Murmur viewer executable (which currently replaces SLVoice.exe in the viewer)
+3.  Run a murmur server to route voice data between viewers after channels have been established via the
+OpenSimulator module.
+
+For detailed instructions on 2 and 3, please see [CONFIG].  Here, we will describe the process of building and 
+configuring the OpenSimulator module in a bit more detail.
+
+Building the OpenSimulator module
+---------------------------------
+
+1.  Copy this directory to $OPENSIM_BASE/addon-modules/Whisper
+2.  Follow the instructions at [MODULE BUILD] to build the module.  This will copy the generated DLL automatically
+into your $OPENSIM_BASE/bin directory.
+
+Configuring the module
+----------------------
+1.  Copy the contents of the OpenSim.ini.include file into your OpenSim.ini
+
+References
+==========
+[CONFIG] - doc/Whisper_Murmur_Config.pdf
+[MODULE BUILD] - 
 
 Release Notes
 =============
+
 0.2.0
 -----
 - updated to compile for OpenSim 0.7.1+ (thanks to Justin)
@@ -18,5 +46,9 @@ Release Notes
 - initial version
 - for OpenSim standalone configuration
 
----------------------------------
-Contact: volker.gaessler@vcomm.ch
+Credits
+=======
+* Volker Gaessler (vcomm.ch)
+* Snoopy Pfeffer (dreamlandmetaverse.com)
+* Justin Clark-Casey (justincc.org)
+* Brian Becker
