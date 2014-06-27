@@ -751,7 +751,7 @@ namespace MurmurVoice
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice] Plugin initialization failed: {0}{1}", e.Message, e.StackTrace);
+                m_log.Error("[MurmurVoice] Plugin initialization failed, ", e);
                 return;
             }
         }
@@ -1037,7 +1037,7 @@ namespace MurmurVoice
                         if (++retry > 50)
                         {
                             m_log.ErrorFormat("[MurmurVoice] Connecting failed {0} (uid {1}) identified by {2}",
-                                              agent.uuid.ToString(), agent.userid, agent.pass);
+                                              agent.uuid, agent.userid, agent.pass);
 
                             return "<llsd><undef /></llsd>";
                         }
@@ -1070,7 +1070,7 @@ namespace MurmurVoice
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[MurmurVoice] Exception: {0}{1}", e.Message, e.StackTrace);
+                m_log.Error("[MurmurVoice] Exception, ", e);
                 return "<llsd><undef /></llsd>";
             }
         }
