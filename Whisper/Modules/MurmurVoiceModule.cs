@@ -647,13 +647,13 @@ namespace MurmurVoice
                 {
                     m_started = true;
 
-                    scene.AddCommand(this, "mumble report", "mumble report",
+                    scene.AddCommand("Mumble", this, "mumble report", "mumble report",
                         "Returns mumble report", MumbleReport);
 
-                    scene.AddCommand(this, "mumble unregister", "mumble unregister <userid>",
+                    scene.AddCommand("Mumble", this, "mumble unregister", "mumble unregister <userid>",
                         "Unregister User by userid", UnregisterUser);
 
-                    scene.AddCommand(this, "mumble remove", "mumble remove <UUID>",
+                    scene.AddCommand("Mumble", this, "mumble remove", "mumble remove <UUID>",
                         "Remove Agent by UUID", RemoveAgent);
 
                     Ice.Communicator comm = Ice.Util.initialize();
