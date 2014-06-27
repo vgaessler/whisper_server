@@ -23,6 +23,12 @@ Building the OpenSimulator module
 2.  Follow the instructions at [MODULE BUILD] to build the module.  This will copy the generated DLL automatically
 into your $OPENSIM_BASE/bin directory.
 
+Installing the OpenSimulator module
+-----------------------------------
+Alternatively, you can install the prebuilt bin/Whisper.dll into $OPENSIM_BASE/bin.  This was built under
+Mono but should work on other systems.  You will also need to copy over bin/Ice.dll and bin/Glacier2.dll if you 
+are going to use the Glacier option.
+
 Configuring the module
 ----------------------
 1.  Copy the contents of the OpenSim.ini.include file into your OpenSim.ini
@@ -30,7 +36,7 @@ Configuring the module
 References
 ==========
 [CONFIG] - doc/Whisper_Murmur_Config.pdf
-[MODULE BUILD] - 
+[MODULE BUILD] - http://opensimulator.org/wiki/IRegionModule#Building_Region_Modules
 
 Release Notes
 =============
